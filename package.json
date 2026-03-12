@@ -1,0 +1,62 @@
+{
+    "name": "playwright-enterprise-pom",
+    "version": "1.0.0",
+    "description": "Playwright end-to-end tests using an enterprise-style Page Object Model (POM) structure.",
+    "main": "index.js",
+    "scripts": {
+        "test": "npx playwright test",
+        "test:desktop": "npx playwright test --project=desktop",
+        "test:mobile": "npx playwright test --project=mobile",
+        "test:auth": "npx playwright test --grep @auth",
+        "test:noauth": "npx playwright test --grep @noauth",
+        "test:smoke": "npx playwright test --grep @smoke",
+        "test:headed": "npx playwright test --headed",
+        "test:report": "npx playwright show-report reports/html-report",
+        "allure:generate": "npx allure generate reports/allure-results --output reports/allure-report",
+        "allure:open": "npx allure open reports/allure-report",
+        "allure:clear": "rm -rf reports/allure-results reports/allure-report",
+        "report:clear": "rm -rf reports/",
+        "test:allure": "npm run test && npm run allure:generate && npm run allure:open",
+        "install:browsers": "npx playwright install --with-deps",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jay-yeluru/playwright-enterprise-pom.git"
+    },
+    "keywords": [
+        "playwright",
+        "e2e",
+        "testing",
+        "page-object-model"
+    ],
+    "author": "Jay Yeluru",
+    "license": "ISC",
+    "type": "commonjs",
+    "engines": {
+        "node": ">=20.0.0"
+    },
+    "bugs": {
+        "url": "https://github.com/jay-yeluru/playwright-enterprise-pom/issues"
+    },
+    "homepage": "https://github.com/jay-yeluru/playwright-enterprise-pom#readme",
+    "dependencies": {
+        "@faker-js/faker": "^10.3.0",
+        "dotenv": "^17.3.1"
+    },
+    "devDependencies": {
+        "@axe-core/playwright": "^4.11.1",
+        "@eslint/js": "^10.0.1",
+        "@playwright/test": "^1.58.2",
+        "allure": "^3.3.1",
+        "allure-js-commons": "^3.6.0",
+        "allure-playwright": "^3.6.0",
+        "eslint": "^10.0.3",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-playwright": "^2.9.0",
+        "eslint-plugin-prettier": "^5.5.5",
+        "prettier": "^3.8.1"
+    }
+}
