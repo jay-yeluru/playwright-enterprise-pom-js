@@ -1,8 +1,18 @@
-const { test, expect } = require('../fixtures/page-manager.fixture');
+const { test, expect } = require('../fixtures/auth-page-manager.fixture');
 const { faker } = require('@faker-js/faker');
 
+const { dataManager } = require('../utils/data-manager');
+
 test.describe('Conduit: Authenticated Session', () => {
-    // This test assumes global-setup has already logged in and saved storageState
+    // EXPLICIT CONTROL: We pull the specific user from data/{env}/auth.js and "send" it to the fixture
+    const user = dataManager.static('auth').user_login;
+    
+    test.use({ 
+        creds: {
+            username: user.username,
+            password: user.password
+        } 
+    });
 
     test.beforeEach(async ({ app }) => {
         // Navigate to home page - should already be logged in

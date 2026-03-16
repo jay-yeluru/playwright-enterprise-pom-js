@@ -1,10 +1,16 @@
 const { defineConfig, devices } = require('@playwright/test');
-require('dotenv').config();
+const path = require('path');
+const testEnv = (process.env.TEST_ENV || 'stage').toLowerCase();
+
+// 1. Load environment-specific file (defaults)
+require('dotenv').config({ path: path.resolve(__dirname, 'env', `.env.${testEnv}`) });
+// 2. Load root .env as a LOCAL OVERRIDE (Master Priority)
+require('dotenv').config({ override: true });
+
 const config = require('./utils/config');
 
 module.exports = defineConfig({
     testDir: './tests',
-    // globalSetup: require.resolve('./global-setup'),
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,

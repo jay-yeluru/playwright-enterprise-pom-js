@@ -15,7 +15,7 @@ class DataManager {
 
     /**
      * Access environment-specific static data.
-     * Usage: data.static('login').user_login
+     * Usage: data.static('auth').user_login
      */
     static(experience) {
         return getData(experience, config.testEnv);

@@ -4,7 +4,7 @@ const config = require('../utils/config');
 
 exports.test = baseTest.extend({
     // Specialized credentials fixture for easier override in tests
-    creds: config.auth,
+    creds: { username: '', password: '' },
 
     // Overriding page fixture to provide an authenticated environment
     page: async ({ request, browser, creds }, use, testInfo) => {

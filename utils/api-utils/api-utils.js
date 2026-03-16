@@ -81,7 +81,7 @@ class ApiUtils {
                 ...frameworkHeaders,
                 ...headerObj,
             };
-            if (process.env.ENV !== 'prod' && Object.keys(headerObj).length > 0) {
+            if (config.testEnv !== 'prod' && Object.keys(headerObj).length > 0) {
                 console.log('adding custom headers: ', headerObj, 'to URL: ', request.url());
             }
             await route.continue({ headers });

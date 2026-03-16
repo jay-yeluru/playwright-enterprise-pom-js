@@ -43,7 +43,7 @@ An enterprise-grade Playwright automation framework designed for scalability, ma
 4. Configure environment variables:
    Create a `.env` file from the example:
    ```bash
-   cp .env.example .env
+   cp env/.env.example .env
    ```
    Update `.env` with your target URL and credentials.
 
@@ -108,7 +108,7 @@ npm run format
 ### Data Management
 The `DataManager` unified dynamic and static data:
 - **Dynamic**: `data.createUser()` (uses Faker)
-- **Static**: `data.static('login').login.user_login` (loads from `data/{env}/login.js`)
+- **Static**: `data.static('auth').user_login` (loads from `data/{env}/auth.js`)
 
 ## 📂 Project Structure
 

@@ -30,6 +30,13 @@ class DashboardPage extends Helpers {
             await this.page.getByRole('button', { name: 'Or click here to logout.' }).click();
         });
     }
+
+    async assertLoggedOut(expect) {
+        await step('Assert User is Logged Out', async () => {
+            // After logout, Sign in link should be visible
+            await expect(this.page.getByRole('link', { name: 'Sign in' })).toBeVisible();
+        });
+    }
 }
 
 module.exports = { DashboardPage };

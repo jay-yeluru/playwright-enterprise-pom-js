@@ -1,14 +1,14 @@
 const { test, expect } = require('../fixtures/auth-page-manager.fixture');
 
 test.describe('Dashboard Tests (Authenticated)', { tag: '@auth' }, () => {
-    test('should display welcome message on dashboard @smoke', async ({ app }) => {
+    test('should verify feed tabs are visible on dashboard @smoke', async ({ app }) => {
         const dashboardPage = app.getDashboardPage();
 
         await dashboardPage.open();
         await dashboardPage.assertLoaded(expect);
-        const welcomeText = await dashboardPage.getWelcomeText();
-
-        expect(welcomeText || '').toMatch(/welcome/i);
+        
+        await expect(dashboardPage.yourFeedTab).toBeVisible();
+        await expect(dashboardPage.globalFeedTab).toBeVisible();
     });
 
     test('should logout successfully', async ({ app }) => {
