@@ -1,0 +1,176 @@
+name: Manual Test Suite
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_env:
+        description: 'Environment'
+        required: true
+        default: 'stage'
+        type: choice
+        options: [stage, beta, prod]
+      project:
+        description: 'Project'
+        required: true
+        default: 'desktop'
+        type: choice
+        options: [desktop, mobile, all]
+      tag:
+        description: 'Test Tag (@smoke, @api, etc.)'
+        required: false
+        default: ''
+        type: choice
+        options:
+          - ''
+          - '@smoke'
+          - '@regression'
+          - '@api'
+          - '@auth'
+          - '@article'
+          - '@login'
+          - '@signup'
+          - '@dashboard'
+          - '@conduit'
+      test_path:
+        description: 'Specific path (e.g. tests/api/)'
+        required: false
+        default: ''
+      grep_regex:
+        description: 'Advanced Grep (Regex)'
+        required: false
+        default: ''
+      shards:
+        description: 'Wait! Sharding only works if multiple jobs are triggered. Select shard count:'
+        required: true
+        default: '1'
+        type: choice
+        options: ['1', '2', '3', '4', '5']
+      workers:
+        description: 'Parallel workers per runner'
+        required: true
+        default: '2'
+        type: choice
+        options: ['1', '2', '4', '8']
+
+jobs:
+  test:
+    name: Run Tests
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4, 5]
+    # Only run the number of shards requested
+    if: matrix.shardIndex <= fromJSON(github.event.inputs.shards)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: |
+          # Build arguments
+          ARGS=""
+          
+          if [ "${{ github.event.inputs.project }}" != "all" ]; then
+            ARGS="$ARGS --project=${{ github.event.inputs.project }}"
+          fi
+          
+          if [ "${{ github.event.inputs.tag }}" != "" ]; then
+            ARGS="$ARGS --grep=${{ github.event.inputs.tag }}"
+          elif [ "${{ github.event.inputs.grep_regex }}" != "" ]; then
+            ARGS="$ARGS --grep=${{ github.event.inputs.grep_regex }}"
+          fi
+          
+          # Execute
+          TEST_ENV=${{ github.event.inputs.test_env }} npx playwright test \
+            ${{ github.event.inputs.test_path }} \
+            $ARGS \
+            --shard=${{ matrix.shardIndex }}/${{ github.event.inputs.shards }} \
+            --workers=${{ github.event.inputs.workers }}
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+          TEST_USER: ${{ secrets.TEST_USER }}
+          TEST_PASS: ${{ secrets.TEST_PASS }}
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.shardIndex }}
+          path: reports/
+          retention-days: 1
+
+  report:
+    name: Publish Results
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all reports
+        uses: actions/download-artifact@v4
+        with:
+          path: all-reports
+          pattern: playwright-report-*
+          merge-multiple: true
+
+      - name: Merge Allure Results
+        run: |
+          mkdir -p reports/allure-results
+          cp -r all-reports/allure-results/* reports/allure-results/ || true
+          node utils/generate-allure-env.js
+        env:
+          BASE_URL: ${{ secrets.BASE_URL || 'https://demo.realworld.show' }}
+          TEST_ENV: ${{ github.event.inputs.test_env }}
+
+      - name: Get Allure history
+        uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: allure-history
+
+      - name: Allure Report Action
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: reports/allure-results
+          allure_history: allure-history
+          keep_reports: 20
+
+      - name: Deploy report to Github Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-history
+          publish_branch: gh-pages

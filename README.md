@@ -3,7 +3,7 @@
 ![Playwright Enterprise Hero](assets/playwright-hero.png)
 
 # 🎭 Playwright Enterprise POM
-### *Scalable, Resilient, and Data-Driven Automation*
+### *Scalable, Resilient, and Assertion-Centric Automation*
 
 [![Playwright](https://img.shields.io/badge/Playwright-1.58.x-2EAD33?style=for-the-badge&logo=playwright)](https://playwright.dev/)
 [![Allure 3](https://img.shields.io/badge/Allure_3-Reporting-FF69B4?style=for-the-badge&logo=allure)](https://allurereport.org/)
@@ -14,7 +14,7 @@
 
 Playwright Enterprise POM is more than just a test suite—it's a production-ready engineering solution for web automation. Built on the **Conduit RealWorld Demo**, it demonstrates advanced patterns for synchronization, session management, and environment-agnostic data sourcing.
 
-[Technical Stack](#technical-stack) • [Architecture](#architecture) • [Env Strategy](#environment--data-strategy) • [Quick Start](#installation--usage)
+[Technical Stack](#-technical-stack) • [Architecture](#-architecture) • [Env Strategy](#-environment--data-strategy) • [Quick Start](#-installation--usage)
 
 </div>
 
@@ -25,7 +25,7 @@ Playwright Enterprise POM is more than just a test suite—it's a production-rea
 *   **Core**: [Playwright](https://playwright.dev/) (Chromium, Firefox, WebKit)
 *   **Language**: JavaScript (ES6+)
 *   **Reporting**: [Allure 3](https://allurereport.org/) + Playwright HTML
-*   **Design Pattern**: Page Object Model (POM) + Dependency Injection (Fixtures)
+*   **Design Pattern**: Page Object Model (POM) + Service Object Pattern (API)
 *   **Data Generation**: [@faker-js/faker](https://fakerjs.dev/)
 *   **CI/CD**: GitHub Actions (Sharded Execution)
 
@@ -36,10 +36,11 @@ Playwright Enterprise POM is more than just a test suite—it's a production-rea
 ![Enterprise Test Architecture](assets/framework-architecture.png)
 
 ### The Layering Strategy
--   **Test Layer**: Focuses on "What" to test. Decoupled from selectors.
--   **Fixture Layer**: The logic hub. Injects managers and handles setup/teardown.
--   **POM Layer**: The UI map. Atomic methods for single-responsibility interactions.
--   **Data Layer**: The fuel. Separates static configuration from dynamic test data.
+-   **Test Layer (`tests/`)**: Focuses on "What" to test. Decoupled from selectors. **Zero `expect` logic** is used here; assertions are outsourced to the layers below.
+-   **Fixture Layer (`fixtures/`)**: The logic hub. Injected managers and automatic session handling (Static & Dynamic).
+-   **POM Layer (`pages/ui/`)**: The UI map. Atomic methods for single-responsibility interactions and **Self-Validating Assertions**.
+-   **Service Layer (`pages/api/`)**: Centralized API validation logic. Handles status codes and payload verification.
+-   **Data Layer (`data/`)**: The fuel. Separates static configuration from dynamic test data.
 
 ---
 
@@ -100,7 +101,7 @@ cp env/.env.example .env
 </details>
 
 <details>
-<summary><b>2. Execution Commands</b></summary>
+<summary><b>2. Execution Commands (Local)</b></summary>
 
 ```bash
 # Standard UI Test run
@@ -109,15 +110,31 @@ npm run test:desktop
 # Targeted Runs (Tags)
 npx playwright test --grep @smoke
 
+# Environment Specific
+TEST_ENV=prod npm run test:desktop
+
 # Debug / UI Mode
 npx playwright test --ui
 ```
 </details>
 
 <details>
-<summary><b>3. CI/CD Insights</b></summary>
+<summary><b>3. Manual Test Trigger (GitHub Actions)</b></summary>
 
-The GitHub Actions pipeline automates:
+You can trigger tests manually with custom configurations via the **Actions** tab:
+1.  **Select Workflow**: Choose `Manual Test Suite`.
+2.  **Configure Inputs**:
+    *   **Environment**: `stage`, `beta`, or `prod`.
+    *   **Tag**: Choose from `@smoke`, `@api`, `@auth`, etc.
+    *   **Project**: `desktop`, `mobile`, or `all`.
+    *   **Advanced**: Override paths, set worker count, or use regex filters.
+3.  **Run**: Click `Run workflow`. Results will be automatically pushed to the Allure Dashboard.
+</details>
+
+<details>
+<summary><b>4. CI/CD & Automation</b></summary>
+
+The GitHub Actions pipeline (`playwright.yml`) automates:
 1.  **Parallel Sharding**: Splitting tests across multiple runners for speed.
 2.  **Artifact Merging**: Consolidating results from all shards into one report.
 3.  **GH Pages Deployment**: Automatic hosting of the latest Allure 3 dashboard.
@@ -127,11 +144,13 @@ The GitHub Actions pipeline automates:
 
 ## 📂 Project Blueprint
 
--   📂 `pages/` — UI Locators and Atomic Actions.
+-   📂 `pages/ui/` — UI Page Objects (Locators + Self-Assertions).
+-   📂 `pages/api/` — API Service Objects (Validation Logic).
 -   📂 `fixtures/` — Custom Fixtures (Dependency Injection).
 -   📂 `data/` — Env-specific JSONs & Faker Generators.
--   📂 `utils/` — API Clients, Config Handlers, and Metadata Generators.
--   📂 `tests/` — High-level E2E Test Specifications.
+-   📂 `utils/` — API Clients, Config Handlers, and Helpers.
+-   📂 `tests/e2e/` — Functional E2E specs grouped by module (`auth`, `articles`, `dashboard`).
+-   📂 `tests/api/` — Service-level validation specs.
 
 ---
 
