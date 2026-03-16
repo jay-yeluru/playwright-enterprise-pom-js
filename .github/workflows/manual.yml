@@ -1,5 +1,8 @@
 name: Manual Test Suite
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   workflow_dispatch:
     inputs:
@@ -40,7 +43,7 @@ on:
         required: false
         default: ''
       shards:
-        description: 'Wait! Sharding only works if multiple jobs are triggered. Select shard count:'
+        description: 'Number of shards'
         required: true
         default: '1'
         type: choice
@@ -53,8 +56,21 @@ on:
         options: ['1', '2', '4', '8']
 
 jobs:
+  setup-matrix:
+    name: Setup Shard Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      indices: ${{ steps.set-shards.outputs.indices }}
+    steps:
+      - id: set-shards
+        run: |
+          # Generate a JSON array [1, 2, ..., shards]
+          INDICES=$(node -e "console.log(JSON.stringify(Array.from({length: ${{ github.event.inputs.shards }}}, (_, i) => i + 1)))")
+          echo "indices=$INDICES" >> $GITHUB_OUTPUT
+
   test:
-    name: Run Tests
+    needs: setup-matrix
+    name: Run Tests (Shard ${{ matrix.shardIndex }}/${{ github.event.inputs.shards }})
     timeout-minutes: 60
     runs-on: ubuntu-latest
     permissions:
@@ -64,9 +80,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shardIndex: [1, 2, 3, 4, 5]
-    # Only run the number of shards requested
-    if: matrix.shardIndex <= fromJSON(github.event.inputs.shards)
+        shardIndex: ${{ fromJSON(needs.setup-matrix.outputs.indices) }}
     steps:
       - uses: actions/checkout@v4
 
