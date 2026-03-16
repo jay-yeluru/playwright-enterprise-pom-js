@@ -1,133 +1,140 @@
-# Playwright Enterprise POM Framework
+<div align="center">
 
-An enterprise-grade Playwright automation framework designed for scalability, maintainability, and clear reporting. This project automates the [Conduit RealWorld Demo](https://demo.realworld.show) app.
+![Playwright Enterprise Hero](assets/playwright-hero.png)
 
-![Automation Flow](https://raw.githubusercontent.com/jay-yeluru/playwright-enterprise-pom/main/conduit-flow.png)
+# 🎭 Playwright Enterprise POM
+### *Scalable, Resilient, and Data-Driven Automation*
 
-## 🚀 Features
-
-- **Page Object Model (POM)**: Robust encapsulation of UI elements and actions.
-- **Fixtures-Driven Architecture**: Clean separation of concerns using custom Playwright fixtures.
-- **Dynamic Data**: Integration with `@faker-js/faker` for realistic test data.
-- **Multi-State Authentication**: Supports both on-the-fly registration and cached session (`storageState`) flows.
-- **Rich Reporting**: Integrated with **Allure 3** and standard Playwright HTML reports.
-- **Step-Level Visibility**: Granular action tracking using `step()` from `allure-js-commons`.
-- **Consolidated Outputs**: All reports, results, and artifacts are stored in a unified `reports/` folder.
-- **Centralized Tagging**: Uses a constants file for consistent test categorization (`@smoke`, `@conduit`, etc.).
-- **CI/CD Ready**: Configured for GitHub Actions with **automated sharding** and report deployment.
-- **Code Consistency**: Pre-configured with **ESLint** and **Prettier** for enterprise coding standards.
-- **Centralized Data Manager**: Systematic test data generation (Faker) and **env-specific static data** (JSON/JS) unified under one hub.
-
-## 🛠️ Prerequisites
-
-- **Node.js**: 20+ (LTS recommended)
-
-## 📦 Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/jay-yeluru/playwright-enterprise-pom.git
-   cd playwright-enterprise-pom
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Install Playwright browsers:
-   ```bash
-   npm run install:browsers
-   ```
-
-4. Configure environment variables:
-   Create a `.env` file from the example:
-   ```bash
-   cp env/.env.example .env
-   ```
-   Update `.env` with your target URL and credentials.
-
-## 🧪 Running Tests
-
-### Standard Execution
-```bash
-# Run all tests
-npm test
-
-# Run tests on Desktop Chrome
-npm run test:desktop
-
-# Run tests matching a specific tag
-npx playwright test --grep @smoke
-```
-
-### Debugging
-```bash
-# Run in headed mode
-npx playwright test --headed
-
-# Run with UI mode
-npx playwright test --ui
-```
-
-## 📊 Reporting
-
-### Allure Report (Recommended)
-```bash
-# Generate report from consolidated results
-npm run allure:generate
-
-# Open the report
-npm run allure:open
-
-# Run tests and open report in one go
-npm run test:allure
-```
-
-### Playwright HTML Report
-```bash
-# View the HTML report
-npm run test:report
-
-# Clear all reporting data
-npm run report:clear
-```
-
-### Code Quality & Data
-```bash
-# Check code for linting errors
-npm run lint
-
-# Automatically fix linting/formatting issues
-npm run lint:fix
-
-# Format code using Prettier
-npm run format
-```
-
-### Data Management
-The `DataManager` unified dynamic and static data:
-- **Dynamic**: `data.createUser()` (uses Faker)
-- **Static**: `data.static('auth').user_login` (loads from `data/{env}/auth.js`)
-
-## 📂 Project Structure
-
-- **`reports/`**: Consolidated test outputs (HTML, Allure, snapshots).
-- **`pages/`**: Page Objects representing application screens.
-- **`fixtures/`**: Custom Playwright fixtures for specialized managers (`app`, `utils`, `helpers`).
-- **`utils/`**: Core utilities including API helpers, configuration managers, and base interactions.
-- **`constants/`**: shared constants like test tags.
-- **`tests/`**: End-to-end test specifications.
-- **`.github/workflows/`**: Continuous Integration pipelines.
-
-## 🛣️ GitHub Actions Pipeline
-
-The project includes a fully automated CI pipeline that:
-1. Triggers on pushes to the `main` branch.
-2. Sets up the Node.js environment.
-3. Installs dependencies and browsers.
-4. Executes tests in headless mode across **parallel shards**.
-5. Aggregates results and publishes a unified Allure report (viewable via GitHub Pages).
+[![Playwright](https://img.shields.io/badge/Playwright-1.58.x-2EAD33?style=for-the-badge&logo=playwright)](https://playwright.dev/)
+[![Allure 3](https://img.shields.io/badge/Allure_3-Reporting-FF69B4?style=for-the-badge&logo=allure)](https://allurereport.org/)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-Automation-2088FF?style=for-the-badge&logo=github-actions)](https://github.com/features/actions)
+[![Code Style](https://img.shields.io/badge/Prettier-Managed-F7B93E?style=for-the-badge&logo=prettier)](https://prettier.io/)
 
 ---
-*Created with ❤️ by [Jay Yeluru](https://github.com/jay-yeluru)*
+
+Playwright Enterprise POM is more than just a test suite—it's a production-ready engineering solution for web automation. Built on the **Conduit RealWorld Demo**, it demonstrates advanced patterns for synchronization, session management, and environment-agnostic data sourcing.
+
+[Technical Stack](#-tech-stack) • [Architecture](#-architecture) • [Env Strategy](#-environment--data-strategy) • [Quick Start](#-installation)
+
+</div>
+
+---
+
+## ⚡ Technical Stack
+
+*   **Core**: [Playwright](https://playwright.dev/) (Chromium, Firefox, WebKit)
+*   **Language**: JavaScript (ES6+)
+*   **Reporting**: [Allure 3](https://allurereport.org/) + Playwright HTML
+*   **Design Pattern**: Page Object Model (POM) + Dependency Injection (Fixtures)
+*   **Data Generation**: [@faker-js/faker](https://fakerjs.dev/)
+*   **CI/CD**: GitHub Actions (Sharded Execution)
+
+---
+
+## 🏢 Architecture
+
+![Enterprise Test Architecture](assets/framework-architecture.png)
+
+### The Layering Strategy
+-   **Test Layer**: Focuses on "What" to test. Decoupled from selectors.
+-   **Fixture Layer**: The logic hub. Injects managers and handles setup/teardown.
+-   **POM Layer**: The UI map. Atomic methods for single-responsibility interactions.
+-   **Data Layer**: The fuel. Separates static configuration from dynamic test data.
+
+---
+
+## 🌐 Environment & Data Strategy
+
+This framework supports a sophisticated multi-environment strategy:
+
+### 1. Environment Switching
+Tests can be targeted at `stage`, `beta`, or `prod` using the `TEST_ENV` variable:
+```bash
+TEST_ENV=prod npm run test:desktop
+```
+
+### 2. The Data Manager Hub
+The `DataManager` resolves data based on the current environment:
+-   **Dynamic Data**: On-the-fly generation using Faker (e.g., random user emails).
+-   **Static Data**: Environment-specific keys (e.g., authentication credentials for Stage vs Prod).
+
+---
+
+## 📊 Reporting & Metadata
+
+Every run generates an **Allure 3** report enriched with system metadata. 
+
+| Automatic Metadata | Description |
+| :--- | :--- |
+| **Executor** | Detects if running on `Local Machine` or `GitHub Actions`. |
+| **Platform** | Captures OS (Darwin, Linux) and Node.js version. |
+| **Live Context** | Injects the active `BaseURL` and `TEST_ENV` into the dashboard. |
+
+```bash
+# Generate and open updated report
+npm run allure:generate && npm run allure:open
+```
+
+---
+
+## 🚀 Installation & Usage
+
+<details>
+<summary><b>1. First-time Setup</b></summary>
+
+```bash
+# Clone and install
+git clone https://github.com/jay-yeluru/playwright-enterprise-pom.git
+npm install
+npm run install:browsers
+
+# Configure overrides
+cp env/.env.example .env
+```
+</details>
+
+<details>
+<summary><b>2. Execution Commands</b></summary>
+
+```bash
+# Standard UI Test run
+npm run test:desktop
+
+# Targeted Runs (Tags)
+npx playwright test --grep @smoke
+
+# Debug / UI Mode
+npx playwright test --ui
+```
+</details>
+
+<details>
+<summary><b>3. CI/CD Insights</b></summary>
+
+The GitHub Actions pipeline automates:
+1.  **Parallel Sharding**: Splitting tests across multiple runners for speed.
+2.  **Artifact Merging**: Consolidating results from all shards into one report.
+3.  **GH Pages Deployment**: Automatic hosting of the latest Allure 3 dashboard.
+</details>
+
+---
+
+## 📂 Project Blueprint
+
+-   📂 `pages/` — UI Locators and Atomic Actions.
+-   📂 `fixtures/` — Custom Fixtures (Dependency Injection).
+-   📂 `data/` — Env-specific JSONs & Faker Generators.
+-   📂 `utils/` — API Clients, Config Handlers, and Metadata Generators.
+-   📂 `tests/` — High-level E2E Test Specifications.
+
+---
+
+<div align="center">
+
+### Modern. Resilient. Data-Driven.
+
+*Maintained by [Jay Yeluru](https://github.com/jay-yeluru)*
+
+[![Follow](https://img.shields.io/github/followers/jay-yeluru?label=Follow&style=social)](https://github.com/jay-yeluru)
+
+</div>
