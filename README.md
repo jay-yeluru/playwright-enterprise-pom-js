@@ -6,12 +6,10 @@
 ### *Scalable, Resilient, and Assertion-Centric Automation*
 
 [![Playwright](https://img.shields.io/badge/Playwright-1.58.x-2EAD33?style=for-the-badge&logo=playwright)](https://playwright.dev/)
-
 [![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-Automation-2088FF?style=for-the-badge&logo=github-actions)](https://github.com/features/actions)
 [![Code Style](https://img.shields.io/badge/Prettier-Managed-F7B93E?style=for-the-badge&logo=prettier)](https://prettier.io/)
 [![Allure 3](https://img.shields.io/badge/Allure_3-Reporting-FF69B4?style=for-the-badge&logo=allure)](https://allurereport.org/)
 
-             [!Live Allure Report](https://jay-yeluru.github.io/playwright-enterprise-pom-js/)
 ---
 
 Playwright Enterprise POM is more than just a test suite—it's a production-ready engineering solution for web automation. Built on the **Conduit RealWorld Demo**, it demonstrates advanced patterns for synchronization, session management, and environment-agnostic data sourcing.
@@ -26,11 +24,12 @@ Playwright Enterprise POM is more than just a test suite—it's a production-rea
 
 *   **Core**: [Playwright](https://playwright.dev/) (Chromium, Firefox, WebKit)
 *   **Language**: JavaScript (ES6+)
-*   **Reporting**: [Allure 3](https://allurereport.org/) + Playwright HTML
 *   **Design Pattern**: Page Object Model (POM) + Service Object Pattern (API)
 *   **Data Generation**: [@faker-js/faker](https://fakerjs.dev/)
 *   **CI/CD**: GitHub Actions (Sharded Execution)
-
+*   **Reporting**: [Allure 3](https://allurereport.org/) + Playwright HTML
+  
+     [Live Allure Report](https://jay-yeluru.github.io/playwright-enterprise-pom-js/)
 ---
 
 ## 🏢 Architecture
